@@ -1,0 +1,17 @@
+numpy
+requests
+datasets
+xgboost<3.0
+langchain
+langgraph
+langchain-groq
+groq
+python-dotenv
+langchain-core
+langchain-community
+fastapi
+pymongo
+uvicorn
+pywebpush
+apscheduler
+ipykernel
