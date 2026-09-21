@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weather History — WeatherGPT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" sizes="32x32" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .histPage{width:100%;max-width:900px;box-sizing:border-box;margin:0 auto;padding:16px 12px;overflow-x:hidden}
+    @media(min-width:640px){.histPage{padding:24px 20px}}
+    .histHeader{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+    .histTitle{font-size:20px;font-weight:800;letter-spacing:-0.02em;margin:0}
+    @media(min-width:640px){.histTitle{font-size:24px}}
+    .histSub{color:var(--muted);font-size:12px;line-height:1.45;margin:4px 0 0}
+    .searchBox{display:flex;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:6px 8px;margin-top:14px;align-items:center}
+    .searchBox input{flex:1;min-width:0;border:none;outline:none;font-size:13px;padding:8px 4px;background:transparent;color:var(--text)}
+    .searchBox input::placeholder{color:var(--muted);opacity:1}
+    [data-theme="dark"] .searchBox input::placeholder{color:#cbd5e1;opacity:.9}
+    .searchBox button{padding:8px 16px;border-radius:8px;border:1px solid #0f172a;background:#0f172a;color:#fff;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;transition:background .2s}
+    [data-theme="dark"] .searchBox button{background:#38bdf8;border-color:#38bdf8;color:#020617}
+    [data-theme="dark"] .searchBox button:hover{background:#0ea5e9}
+    .locResults{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap}
+    .locResults button{padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;color:var(--text)}
+    .rangeRow{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+    @media(min-width:640px){.rangeRow{flex-direction:row;align-items:center;justify-content:space-between}}
+    .rangeBtns{display:flex;gap:6px;flex-wrap:wrap}
+    .rangeBtns button,.navBtns button{padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer;color:var(--text);font-weight:500;transition:all .2s}
+    .rangeBtns button.active{background:#0f172a;color:#fff;border-color:#0f172a;font-weight:600}
+    [data-theme="dark"] .rangeBtns button.active{background:#38bdf8;color:#020617;border-color:#38bdf8}
+    .rangeNav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .rangeLabel{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap}
+    .navBtns{display:flex;gap:6px}
+    .timelineWrap{width:100%;max-width:100%;box-sizing:border-box;margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .timeline{display:flex;gap:8px;width:max-content;min-width:0}
+    .tDay{flex:0 0 92px;width:92px;text-align:center;padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .2s}
+    .tDay:hover{border-color:var(--muted)}
+    .tDay.today{border-color:#0ea5e9;background:#f0f9ff}
+    [data-theme="dark"] .tDay.today{background:#0c1a2e;border-color:#38bdf8}
+    .tDay.selected{border-color:#0ea5e9;background:var(--surface);box-shadow:0 0 0 2px #0ea5e9}
+    [data-theme="dark"] .tDay.selected{border-color:#38bdf8;box-shadow:0 0 0 2px #38bdf8}
+    .tDate{font-size:11px;color:var(--muted);font-weight:600}
+    .tTemp{font-size:15px;font-weight:800;margin-top:4px;color:var(--text)}
+    .tCode{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tType{margin-top:6px}
+    .chartWrap{margin-top:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px}
+    .chartTitle{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    .chartSvg{width:100%;height:130px;margin-top:8px;display:block}
+    #chartLabels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:6px;padding:0 10px;overflow:hidden}
+    .cardsGrid{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+    @media(max-width:480px){.cardsGrid{grid-template-columns:repeat(2,1fr);gap:8px}}
+    .hCard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;cursor:pointer;min-width:0;transition:all .2s}
+    .hCard:hover{border-color:var(--muted)}
+    .hCard.selected{border-color:#0ea5e9;box-shadow:0 0 0 2px #0ea5e9}
+    [data-theme="dark"] .hCard.selected{border-color:#38bdf8;box-shadow:0 0 0 2px #38bdf8}
+    .hCardHead{display:flex;justify-content:space-between;align-items:center;gap:4px}
+    .hCardDate{font-size:11px;font-weight:600;color:var(--text)}
+    .hCardTemp{margin-top:6px;font-size:15px;font-weight:800;color:var(--text)}
+    .hCardSub{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .dayDetail{margin-top:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px}
+    .detailGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+    .dItem{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px}
+    .dLabel{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    .dVal{font-size:13px;font-weight:700;margin-top:4px}
+    .hourRow{display:flex;gap:6px;overflow-x:auto;margin-top:12px;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+    .hourBox{flex:0 0 64px;text-align:center;padding:8px 6px;border:1px solid var(--border);background:var(--bg);border-radius:8px}
+    .hourBox .hTime{font-size:10px;color:var(--muted)}
+    .hourBox .hTemp{font-size:12px;font-weight:700;margin-top:2px}
+    .loading{padding:20px;text-align:center;color:var(--muted);font-size:13px}
+    .error{padding:12px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;color:#991b1b;font-size:12px;margin-top:12px}
+    .badge{display:inline-flex;align-items:center;padding:2px 6px;border-radius:6px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+    .badge-historical{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
+    .badge-forecast{background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd}
+    [data-theme="dark"] .badge-historical{background:#1e293b;color:#cbd5e1;border-color:#334155}
+    [data-theme="dark"] .badge-forecast{background:#0c4a6e;color:#7dd3fc;border-color:#0369a1}
+  </style>
+</head>
+<body>
+  <div class="bgGlow"></div>
+  <div class="appShell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sideTop">
+        <div class="sideBrand">
+          <img src="weathergpt.png" alt="WeatherGPT" style="width:24px;height:24px;border-radius:6px;object-fit:cover;flex-shrink:0" />
+          <span class="sideName">WeatherGPT</span>
+          <button id="sidebarClose" class="sidebarClose" aria-label="Toggle sidebar" title="Toggle sidebar"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg></button>
+        </div>
+        <button id="newChatBtn" class="newChatBtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg></span> <span class="text">New Chat</span></button>
+        <nav class="sideNav">
+          <a href="/" class="sideLink"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg></span> <span class="text">Chat</span></a>
+          <a href="/history.html" class="sideLink active"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l2 2"/></svg></span> <span class="text">History</span></a>
+          <a href="/alerts.html" class="sideLink"><span class="icon" style="position:relative"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/><path d="M12 9v3"/><path d="M12 14.5v.01"/></svg><span id="alertBadge" class="alertBadge hidden"></span></span> <span class="text">Alerts</span></a>
+          <a href="/study.html" class="sideLink"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span> <span class="text">Study</span></a>
+        </nav>
+      </div>
+      <div class="sideFoot"><span class="footText">AI · GFS + XGBoost · Voice</span></div>
+    </aside>
+    <div id="sidebarOverlay" class="sidebarOverlay hidden"></div>
+    <div class="mainCol">
+  <header class="topbar">
+    <div class="topbarInner">
+      <div class="brandRow">
+        <button id="sidebarOpen" class="iconBtn" aria-label="Open sidebar" title="Toggle sidebar"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg></button>
+        <a href="/" class="brandLink">
+          <img src="weathergpt.png" alt="WeatherGPT" style="width:26px;height:26px;border-radius:6px;object-fit:cover;flex-shrink:0" />
+          <span class="brandName">WeatherGPT</span>
+          <span class="brandBadge">INDIA</span>
+        </a>
+      </div>
+      <div class="topActions">
+        <a href="/" class="topLink">Chat</a>
+        <a href="/history.html" class="topLink active">History</a>
+        <a href="/alerts.html" class="topLink">Alerts</a>
+        <a href="/study.html" class="topLink">Study</a>
+        <button id="themeToggleHist" class="iconBtn" aria-label="Toggle theme" title="Toggle theme">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="histPage">
+    <div class="histHeader">
+      <div>
+        <h1 class="histTitle">Weather History</h1>
+        <p class="histSub">Past, today and forecast — one timeline. Historical via ERA5, forecast via GFS + ML.</p>
+      </div>
+    </div>
+
+    <div class="searchBox">
+      <input id="locInput" type="text" placeholder="Search location — e.g. Patna" value="Patna" />
+      <button id="searchBtn">Search</button>
+    </div>
+    <div id="locResults" class="locResults"></div>
+    <div id="selectedLoc" style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
+
+    <div class="rangeRow">
+      <div class="rangeBtns">
+        <button data-range="7" class="active">7 Days</button>
+        <button data-range="14">14 Days</button>
+        <button data-range="30">30 Days</button>
+      </div>
+      <div class="rangeNav">
+        <span class="rangeLabel" id="rangeLabel">Sep 15 — Sep 22</span>
+        <div class="navBtns">
+          <button id="prevBtn" aria-label="Previous">← Prev</button>
+          <button id="nextBtn" aria-label="Next">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="loading" class="loading hidden">Loading weather history...</div>
+    <div id="error" class="error hidden"></div>
+
+    <div class="timelineWrap">
+      <div id="timeline" class="timeline"></div>
+    </div>
+
+    <div class="chartWrap">
+      <div class="chartTitle">Temperature — Max / Min</div>
+      <svg id="chart" class="chartSvg" viewBox="0 0 700 120" preserveAspectRatio="none"></svg>
+      <div id="chartLabels"></div>
+    </div>
+
+    <div id="cards" class="cardsGrid"></div>
+    <div id="dayDetail" class="dayDetail hidden"></div>
+  </main>
+  </div>
+  </div>
+
+  <script>
+    (function(){
+      const sidebar=document.getElementById("sidebar"), overlay=document.getElementById("sidebarOverlay");
+      const openBtn=document.getElementById("sidebarOpen"), closeBtn=document.getElementById("sidebarClose");
+      function updateHamburger(){
+        if(!sidebar || !openBtn) return;
+        const isCollapsed=sidebar.classList.contains("collapsed");
+        const isDesktop=window.innerWidth>=860;
+        if(isDesktop){ openBtn.style.display=isCollapsed?"inline-flex":"none"; openBtn.style.visibility=isCollapsed?"visible":"hidden"; }
+        else { openBtn.style.display="inline-flex"; openBtn.style.visibility="visible"; }
+      }
+      function set(open){
+        if(!sidebar) return;
+        const isMobile=window.innerWidth<860;
+        if(isMobile){ sidebar.classList.toggle("collapsed", !open); overlay.classList.toggle("hidden", !open); }
+        else { sidebar.classList.toggle("collapsed", !open); localStorage.setItem("sidebarOpen", open?"1":"0"); }
+        updateHamburger();
+      }
+      if(openBtn) openBtn.addEventListener("click", ()=> set(true));
+      if(closeBtn) closeBtn.addEventListener("click", ()=> { const c=sidebar.classList.contains("collapsed"); set(c); });
+      if(overlay) overlay.addEventListener("click", ()=> set(false));
+      const saved=localStorage.getItem("sidebarOpen");
+      if(window.innerWidth>=860 && saved==="0") sidebar?.classList.add("collapsed");
+      else if(window.innerWidth<860){ sidebar?.classList.add("collapsed"); overlay?.classList.add("hidden"); }
+      updateHamburger();
+      window.addEventListener("resize", updateHamburger);
+      const nb=document.getElementById("newChatBtn"); if(nb) nb.addEventListener("click", ()=> window.location.href="/");
+    })();
+    let loc={name:"Patna",latitude:25.5941,longitude:85.1376,country:"India"};
+    let rangeDays=7, anchorDate=new Date(), historyDays=[], selectedDate=null;
+    const locInput=document.getElementById("locInput"), searchBtn=document.getElementById("searchBtn"), locResults=document.getElementById("locResults");
+    const selectedLocEl=document.getElementById("selectedLoc"), timelineEl=document.getElementById("timeline"), cardsEl=document.getElementById("cards");
+    const chartEl=document.getElementById("chart"), chartLabels=document.getElementById("chartLabels"), rangeLabel=document.getElementById("rangeLabel");
+    const loadingEl=document.getElementById("loading"), errorEl=document.getElementById("error"), dayDetailEl=document.getElementById("dayDetail");
+    function fmtDate(d){return d.toISOString().slice(0,10)}
+    function fmtShort(dstr){const d=new Date(dstr); return d.toLocaleDateString("en-IN",{day:"numeric",month:"short"})}
+    function wmoDesc(code){if(code===0) return "Clear"; if(code<=3) return "Cloudy"; if(code<=51) return "Drizzle"; if(code<=67) return "Rain"; if(code<=77) return "Snow"; if(code<=82) return "Showers"; if(code>=95) return "Storm"; return "—";}
+    async function searchLoc(){
+      const q=locInput.value.trim(); if(!q) return;
+      try{
+        const r=await fetch(`/api/history/locations?q=${encodeURIComponent(q)}`);
+        const j=await r.json();
+        locResults.innerHTML="";
+        for(const l of j.locations||[]){
+          const b=document.createElement("button");
+          b.textContent=`${l.name}${l.admin1? ", "+l.admin1:""} ${l.country? "· "+l.country:""}`;
+          b.addEventListener("click",()=>{ loc={name:l.name, latitude:l.latitude, longitude:l.longitude, country:l.country}; selectedLocEl.textContent=`📍 ${l.name}${l.admin1? ", "+l.admin1:""} · ${l.country} (${l.latitude.toFixed(2)}, ${l.longitude.toFixed(2)})`; locResults.innerHTML=""; fetchHistory(); });
+          locResults.appendChild(b);
+        }
+        if(!(j.locations||[]).length) locResults.innerHTML="<span style='font-size:12px;color:#991b1b'>Location not found</span>";
+      }catch(e){ errorEl.textContent="Location search failed"; errorEl.classList.remove("hidden"); }
+    }
+    searchBtn.addEventListener("click", searchLoc);
+    locInput.addEventListener("keydown", e=>{ if(e.key==="Enter") searchLoc(); });
+    function getRange(){const half=Math.floor(rangeDays/2); const start=new Date(anchorDate); start.setDate(anchorDate.getDate()-half); const end=new Date(start); end.setDate(start.getDate()+rangeDays-1); return {start: fmtDate(start), end: fmtDate(end)}}
+    async function fetchHistory(){
+      const {start,end}=getRange(); rangeLabel.textContent=`${fmtShort(start)} — ${fmtShort(end)}`;
+      loadingEl.classList.remove("hidden"); errorEl.classList.add("hidden"); dayDetailEl.classList.add("hidden");
+      try{
+        const r=await fetch(`/api/history?latitude=${loc.latitude}&longitude=${loc.longitude}&start_date=${start}&end_date=${end}&name=${encodeURIComponent(loc.name)}&country=${encodeURIComponent(loc.country||"")}`);
+        if(!r.ok) throw new Error((await r.json()).detail||"Failed");
+        const j=await r.json(); historyDays=j.days||[];
+        selectedLocEl.textContent=`📍 ${j.location.name} · ${j.location.latitude.toFixed(2)}, ${j.location.longitude.toFixed(2)} · ${j.location.timezone}`;
+        renderTimeline(); renderCards(); renderChart();
+        if(historyDays.length) selectDay(historyDays[Math.floor(historyDays.length/2)].date);
+      }catch(e){ errorEl.textContent=e.message||String(e); errorEl.classList.remove("hidden"); }
+      finally{ loadingEl.classList.add("hidden"); }
+    }
+    function renderTimeline(){
+      timelineEl.innerHTML="";
+      for(const d of historyDays){
+        const div=document.createElement("div");
+        div.className=`tDay ${d.type} ${selectedDate===d.date?"selected":""}`;
+        const todayStr=new Date().toISOString().slice(0,10);
+        if(d.date===todayStr) div.classList.add("today");
+        div.innerHTML=`<div class="tDate">${fmtShort(d.date)}</div><div class="tTemp">${d.temperature_max!=null? Math.round(d.temperature_max)+"°":"—"}</div><div class="tCode">${wmoDesc(d.weather_code)}</div><div class="tType"><span class="badge badge-${d.type}">${d.type==='historical'?'ERA5':'GFS'}</span></div>`;
+        div.addEventListener("click",()=> selectDay(d.date));
+        timelineEl.appendChild(div);
+      }
+    }
+    function renderCards(){
+      cardsEl.innerHTML="";
+      for(const d of historyDays){
+        const div=document.createElement("div");
+        div.className=`hCard ${selectedDate===d.date?"selected":""}`;
+        const srcLabel=d.type==='historical'?'ERA5 Historical':(d.source.length>20?'GFS + ML Forecast':d.source);
+        div.innerHTML=`<div class="hCardHead"><span class="hCardDate">${fmtShort(d.date)}</span><span class="badge badge-${d.type}">${d.type}</span></div><div class="hCardSub" style="margin-top:4px" title="${d.source}">${srcLabel}</div><div class="hCardTemp">${d.temperature_max!=null? Math.round(d.temperature_max)+"°":"—"} <span style="font-size:11px;font-weight:500;color:var(--muted)">/ ${d.temperature_min!=null? Math.round(d.temperature_min)+"°":""}</span></div><div class="hCardSub">${wmoDesc(d.weather_code)}${d.precipitation!=null? " · "+d.precipitation+"mm":""}</div>`;
+        div.addEventListener("click",()=> selectDay(d.date));
+        cardsEl.appendChild(div);
+      }
+    }
+    function renderChart(){
+      const temps=historyDays.map(d=>d.temperature_max).filter(v=>v!=null);
+      if(!temps.length) return;
+      const min=Math.min(...temps)-2, max=Math.max(...temps)+2;
+      const W=700,H=120,pad=10,n=historyDays.length;
+      const mins=historyDays.map(d=>d.temperature_min);
+      function y(v){return H-pad-((v-min)/(max-min||1))*(H-2*pad)}
+      function x(i){return pad+(i/(n-1||1))*(W-2*pad)}
+      let pathMax="",pathMin="";
+      historyDays.forEach((d,i)=>{ if(d.temperature_max!=null) pathMax += (i===0?"M":"L")+x(i)+","+y(d.temperature_max)+" "; if(d.temperature_min!=null) pathMin += (i===0?"M":"L")+x(i)+","+y(d.temperature_min)+" "; });
+      chartEl.innerHTML=`<path d="${pathMax}" fill="none" stroke="#0ea5e9" stroke-width="2"/><path d="${pathMin}" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"/>`+historyDays.map((d,i)=> d.temperature_max!=null? `<circle cx="${x(i)}" cy="${y(d.temperature_max)}" r="3" fill="#0ea5e9"/>`:"").join("");
+      
+      let displayIndices=[];
+      if(n<=7){ displayIndices=historyDays.map((_,i)=>i); }
+      else if(n<=14){ displayIndices=[0,2,4,6,8,10,12,n-1]; }
+      else{ const step=(n-1)/5; for(let k=0;k<=5;k++) displayIndices.push(Math.round(k*step)); }
+      displayIndices=Array.from(new Set(displayIndices)).sort((a,b)=>a-b);
+      chartLabels.innerHTML=displayIndices.map(idx=> `<span>${fmtShort(historyDays[idx].date)}</span>`).join("");
+    }
+    async function selectDay(dateStr){
+      selectedDate=dateStr; renderTimeline(); renderCards();
+      dayDetailEl.classList.remove("hidden"); dayDetailEl.innerHTML="<div style='font-size:12px;color:var(--muted)'>Loading hourly...</div>";
+      try{
+        const r=await fetch(`/api/history/day?latitude=${loc.latitude}&longitude=${loc.longitude}&date=${dateStr}&name=${encodeURIComponent(loc.name)}`);
+        if(!r.ok) throw new Error((await r.json()).detail||"Failed");
+        const j=await r.json(); const d=j.daily, h=j.hourly||[];
+        const srcLabel=j.type==='historical'?'ERA5 Historical':'GFS + ML Forecast';
+        dayDetailEl.innerHTML=`
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <div><div style="font-size:15px;font-weight:800;color:var(--text)">${j.date} <span class="badge badge-${j.type}">${srcLabel}</span></div><div style="font-size:12px;color:var(--muted);margin-top:2px">📍 ${j.location.name}</div></div>
+            <div style="font-size:28px;font-weight:800;color:var(--text)">${d.temperature_2m_max!=null? Math.round(d.temperature_2m_max)+"°":""}</div>
+          </div>
+          <div class="detailGrid">
+            <div class="dItem"><div class="dLabel">High</div><div class="dVal">${d.temperature_2m_max!=null? d.temperature_2m_max+"°":"—"}</div></div>
+            <div class="dItem"><div class="dLabel">Low</div><div class="dVal">${d.temperature_2m_min!=null? d.temperature_2m_min+"°":"—"}</div></div>
+            <div class="dItem"><div class="dLabel">Rain</div><div class="dVal">${d.precipitation_sum!=null? d.precipitation_sum+" mm":"—"}</div></div>
+          </div>
+          <div style="margin-top:12px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)">Hourly Forecast</div>
+          <div class="hourRow">${h.map(x=> `<div class="hourBox"><div class="hTime">${x.time? x.time.slice(11,16):""}</div><div class="hTemp">${x.temperature_2m!=null? Math.round(x.temperature_2m)+"°":"—"}</div><div style="font-size:10px;color:var(--muted)">${x.precipitation!=null? x.precipitation+"mm":""}</div></div>`).join("")}</div>
+        `;
+      }catch(e){ dayDetailEl.innerHTML=`<div style="color:#991b1b;font-size:12px">Failed: ${e.message}</div>`; }
+    }
+    document.querySelectorAll(".rangeRow button[data-range]").forEach(b=>{ b.addEventListener("click",()=>{ document.querySelectorAll(".rangeRow button[data-range]").forEach(x=>x.classList.remove("active")); b.classList.add("active"); rangeDays=parseInt(b.dataset.range,10); anchorDate=new Date(); fetchHistory(); }); });
+    document.getElementById("prevBtn").addEventListener("click",()=>{ anchorDate.setDate(anchorDate.getDate()-rangeDays); fetchHistory(); });
+    document.getElementById("nextBtn").addEventListener("click",()=>{ anchorDate.setDate(anchorDate.getDate()+rangeDays); fetchHistory(); });
+    // handle alert redirect ?q=Patna → auto load Patna, Bihar without showing world suggestions
+    (async function handleAlertQuery(){
+      const p=new URLSearchParams(window.location.search);
+      const q=p.get("q")||p.get("city")||p.get("district");
+      if(q){
+        locInput.value=q;
+        try{
+          const r=await fetch(`/api/history/locations?q=${encodeURIComponent(q)}`);
+          const j=await r.json();
+          // pick India/Bihar Patna first, fallback to first
+          const best = (j.locations||[]).find(l=> l.country==="India" && l.name.toLowerCase()===q.toLowerCase()) || (j.locations||[]).find(l=> l.country==="India") || (j.locations||[])[0];
+          if(best){
+            loc={name:best.name, latitude:best.latitude, longitude:best.longitude, country:best.country};
+            locInput.value=best.name;
+            locResults.innerHTML=""; // don't show world suggestions when coming from notification
+          }
+        }catch{}
+        // history will be fetched by the final fetchHistory() call below; no chip list shown
+      }
+    })();
+    selectedLoc=document.getElementById("selectedLoc"); // fix ref
+    fetchHistory();
+    // theme init for history
+    const tHist=document.getElementById("themeToggleHist");
+    function applyHist(t){ document.documentElement.setAttribute("data-theme",t); localStorage.setItem("theme",t); if(tHist) tHist.textContent=t==="dark"?"☀":"◐"; }
+    if(tHist) tHist.addEventListener("click",()=>{ const c=document.documentElement.getAttribute("data-theme")||"light"; applyHist(c==="dark"?"light":"dark"); });
+    const savedHist=localStorage.getItem("theme"); if(savedHist) applyHist(savedHist);
+  </script>
+</body>
+</html>

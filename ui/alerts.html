@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weather Alerts — WeatherGPT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" sizes="32x32" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .alertsPage{max-width:720px;margin:0 auto;padding:24px 16px}
+    .alertsHeader{margin-bottom:18px}
+    .alertsHeader h1{font-size:22px;font-weight:800;letter-spacing:-0.02em;margin:0;color:var(--text)}
+    .alertsHeader p{color:var(--muted);font-size:13px;margin:6px 0 0}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px}
+    .enabledList{margin-top:16px}
+    .enabledItem{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg);margin-bottom:8px}
+    .enabledItem .name{font-weight:600;font-size:13px;color:var(--text)}
+    .enabledItem .meta{font-size:11px;color:var(--muted)}
+    .enabledItem button{padding:7px 10px;border-radius:8px;border:1px solid #fecaca;background:var(--surface);color:#991b1b;font-size:12px;cursor:pointer}
+    .emptyState{padding:24px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed var(--border);border-radius:12px;background:var(--surface)}
+    .alertBtn{background:#0f172a;border-color:#0f172a;color:#fff;transition:opacity .15s}
+    .alertBtn:disabled{opacity:.45;cursor:not-allowed}
+    [data-theme="dark"] .alertBtn{background:#38bdf8;border-color:#38bdf8;color:#020617;font-weight:700}
+    [data-theme="dark"] .alertBtn:hover:not(:disabled){background:#0ea5e9;border-color:#0ea5e9}
+    [data-theme="dark"] .alertBtn:disabled{opacity:.45}
+    [data-theme="dark"] #alertInput::placeholder{color:#94a3b8;opacity:1}
+    #alertInput::placeholder{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="bgGlow"></div>
+  <div class="appShell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sideTop">
+        <div class="sideBrand">
+          <img src="weathergpt.png" alt="WeatherGPT" style="width:24px;height:24px;border-radius:6px;object-fit:cover;flex-shrink:0" />
+          <span class="sideName">WeatherGPT</span>
+          <button id="sidebarClose" class="sidebarClose" aria-label="Toggle sidebar" title="Toggle sidebar"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg></button>
+        </div>
+        <button id="newChatBtn" class="newChatBtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg></span> <span class="text">New Chat</span></button>
+        <nav class="sideNav">
+          <a href="/" class="sideLink"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg></span> <span class="text">Chat</span></a>
+          <a href="/history.html" class="sideLink"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l2 2"/></svg></span> <span class="text">History</span></a>
+          <a href="/alerts.html" class="sideLink active"><span class="icon" style="position:relative"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/><path d="M12 9v3"/><path d="M12 14.5v.01"/></svg><span id="alertBadge" class="alertBadge hidden"></span></span> <span class="text">Alerts</span></a>
+          <a href="/study.html" class="sideLink"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span> <span class="text">Study</span></a>
+        </nav>
+      </div>
+      <div class="sideFoot"><span class="footText">AI · GFS + XGBoost · Voice</span></div>
+    </aside>
+    <div id="sidebarOverlay" class="sidebarOverlay hidden"></div>
+    <div class="mainCol">
+  <header class="topbar">
+    <div class="topbarInner">
+      <div class="brandRow">
+        <button id="sidebarOpen" class="iconBtn" aria-label="Open sidebar" title="Toggle sidebar"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg></button>
+        <a href="/" class="brandLink">
+          <img src="weathergpt.png" alt="WeatherGPT" style="width:26px;height:26px;border-radius:6px;object-fit:cover;flex-shrink:0" />
+          <span class="brandName">WeatherGPT</span>
+          <span class="brandBadge">INDIA</span>
+        </a>
+      </div>
+      <div class="topActions">
+        <a href="/" class="topLink">Chat</a>
+        <a href="/history.html" class="topLink">History</a>
+        <a href="/alerts.html" class="topLink active">Alerts</a>
+        <a href="/study.html" class="topLink">Study</a>
+        <button id="themeToggleAlerts" class="iconBtn" aria-label="Toggle theme" title="Toggle theme">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="alertsPage">
+    <div class="alertsHeader">
+      <h1>Weather Alerts</h1>
+      <p>Enable alerts for any district. We monitor IMD warnings in background and notify you only when your district is affected.</p>
+    </div>
+
+    <div class="card">
+      <label class="fieldLabel">Your district</label>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <input id="alertInput" type="text" placeholder="Type your city — e.g. Patna, Delhi, Kolkata" style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;outline:none" />
+        <button id="enableBtn" class="alertBtn">Enable Alerts</button>
+      </div>
+      <div id="enableStatus" style="margin-top:8px;font-size:12px;color:var(--text);min-height:14px"></div>
+      <div style="margin-top:6px;font-size:11px;color:var(--muted)">Any district works — just type your city or town.</div>
+    </div>
+
+    <div style="margin-top:18px;display:flex;justify-content:space-between;align-items:center">
+      <h3 style="font-size:13px;font-weight:700;margin:0">Your enabled alerts</h3>
+      <button id="refreshBtn" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;cursor:pointer">Refresh</button>
+    </div>
+    <div id="enabledList" class="enabledList"></div>
+
+
+  </main>
+  </div>
+  </div>
+
+  <script>
+    // sidebar for alerts (mobile + desktop)
+    (function(){
+      const sidebar=document.getElementById("sidebar"), overlay=document.getElementById("sidebarOverlay");
+      const openBtn=document.getElementById("sidebarOpen"), closeBtn=document.getElementById("sidebarClose");
+      function updateHamburger(){
+        if(!sidebar || !openBtn) return;
+        const isCollapsed=sidebar.classList.contains("collapsed");
+        const isDesktop=window.innerWidth>=860;
+        if(isDesktop){ openBtn.style.display=isCollapsed?"grid":"none"; openBtn.style.visibility=isCollapsed?"visible":"hidden"; }
+        else { openBtn.style.display="grid"; openBtn.style.visibility="visible"; }
+      }
+      function set(open){
+        if(!sidebar) return;
+        const isMobile=window.innerWidth<860;
+        if(isMobile){ sidebar.classList.toggle("collapsed", !open); overlay.classList.toggle("hidden", !open); }
+        else { sidebar.classList.toggle("collapsed", !open); localStorage.setItem("sidebarOpen", open?"1":"0"); }
+        updateHamburger();
+      }
+      if(openBtn) openBtn.addEventListener("click", ()=> set(true));
+      if(closeBtn) closeBtn.addEventListener("click", ()=> { const c=sidebar.classList.contains("collapsed"); set(c); });
+      if(overlay) overlay.addEventListener("click", ()=> set(false));
+      const saved=localStorage.getItem("sidebarOpen");
+      if(window.innerWidth>=860 && saved==="0") sidebar?.classList.add("collapsed");
+      else if(window.innerWidth<860){ sidebar?.classList.add("collapsed"); overlay?.classList.add("hidden"); }
+      updateHamburger();
+      window.addEventListener("resize", updateHamburger);
+      const nb=document.getElementById("newChatBtn"); if(nb) nb.addEventListener("click", ()=> window.location.href="/");
+    })();
+    const input=document.getElementById('alertInput');
+    const enableBtn=document.getElementById('enableBtn');
+    const enableStatus=document.getElementById('enableStatus');
+    const listEl=document.getElementById('enabledList');
+    const districtMap={patna:{id:573,state:"Bihar"},gaya:{id:320,state:"Bihar"},delhi:{id:195,state:"Delhi"},mumbai:{id:576,state:"Maharashtra"},kolkata:{id:446,state:"West Bengal"},pune:{id:411,state:"Maharashtra"},chennai:{id:602,state:"Tamil Nadu"},bengaluru:{id:572,state:"Karnataka"},hyderabad:{id:534,state:"Telangana"},lucknow:{id:312,state:"Uttar Pradesh"},ahmedabad:{id:144,state:"Gujarat"},jaipur:{id:113,state:"Rajasthan"}};
+    function parse(v){const k=v.trim().toLowerCase();const h=districtMap[k];if(h) return {id:h.id,state:h.state,name:v.trim()}; return {id:null,state:"",name:v.trim()}}
+    function urlB64ToUint8(b){const p="=".repeat((4-b.length%4)%4);const s=(b+p).replace(/-/g,"+").replace(/_/g,"/");const r=atob(s);return Uint8Array.from([...r].map(c=>c.charCodeAt(0)))}
+    function updateBtnState(){
+      const raw=input.value.trim();
+      const my=JSON.parse(localStorage.getItem("myAlerts")||"[]");
+      const {id,name}=parse(raw);
+      const already=my.some(x=>x.name.toLowerCase()===raw.toLowerCase());
+      const invalid=!raw || id===null;
+      enableBtn.disabled = invalid || already;
+      if(already && raw) enableStatus.textContent="Already enabled for "+name+" — check 'Your enabled alerts' below.";
+      else if(!raw) enableStatus.textContent="";
+      else if(invalid) enableStatus.textContent="";
+    }
+    async function enable(){
+      const raw=input.value.trim(); if(!raw){enableStatus.textContent="Type your district — e.g. Patna"; updateBtnState(); return}
+      let {id,name,state}=parse(raw);
+      if(id===null){ enableStatus.textContent="We don't support '"+name+"' yet. Try Patna, Delhi, Kolkata, Mumbai or Gaya."; updateBtnState(); return; }
+      const myCheck=JSON.parse(localStorage.getItem("myAlerts")||"[]");
+      if(myCheck.some(x=>x.name.toLowerCase()===name.toLowerCase())){ enableStatus.textContent="Already enabled for "+name; updateBtnState(); return; }
+      enableBtn.disabled=true; enableBtn.textContent="Enabling...";
+      enableStatus.textContent="Requesting permission...";
+      try{
+        const perm=await Notification.requestPermission();
+        if(perm!=="granted"){enableStatus.textContent="Permission denied — enable notifications in browser"; return}
+        await navigator.serviceWorker.register("/sw.js");
+        const reg=await navigator.serviceWorker.ready;
+        const vp=await fetch("/api/alerts/vapid-public-key").then(r=>r.json());
+        let sub={endpoint:"no-push-"+Date.now(),keys:{}};
+        if(vp.publicKey){
+          const subObj=await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:urlB64ToUint8(vp.publicKey)});
+          sub=subObj.toJSON();
+        }
+        // save locally so we can show "your" alerts without user_id (per-device)
+        const my=JSON.parse(localStorage.getItem("myAlerts")||"[]");
+        const res=await fetch("/api/alerts/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({location_name:name, district_id:id, state, push_subscription:sub})});
+        const j=await res.json(); if(!res.ok) throw new Error(j.error||"subscribe failed");
+        if(!my.find(x=>x.name.toLowerCase()===name.toLowerCase())){my.push({name,district_id:id,state, endpoint:sub.endpoint}); localStorage.setItem("myAlerts",JSON.stringify(my));}
+        enableStatus.textContent="Alerts enabled for "+name+" — you'll be notified when IMD issues a warning.";
+        loadList(); updateBtnState();
+      }catch(e){enableStatus.textContent=e.message||String(e)}
+      finally{ enableBtn.disabled=false; enableBtn.textContent="Enable Alerts"; updateBtnState(); }
+    }
+    async function loadList(){
+      const my=JSON.parse(localStorage.getItem("myAlerts")||"[]");
+      if(!my.length){listEl.innerHTML='<div class="emptyState">No alerts enabled on this device yet.<br>Enable one above — it will be stored per-browser (no login needed).</div>'; return}
+      listEl.innerHTML="";
+      for(const item of my){
+        const div=document.createElement("div"); div.className="enabledItem";
+        div.innerHTML=`<div><div class="name">${item.name}</div><div class="meta">District ${item.district_id||"pending mapping"} · ${item.state||"India"} · This device</div></div><button data-endpoint="${item.endpoint}">Disable</button>`;
+        const btn=div.querySelector("button");
+        btn.addEventListener("click", async()=>{
+          try{ await fetch("/api/alerts/unsubscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({endpoint:item.endpoint})}); }catch{}
+          const updated=my.filter(x=>x.endpoint!==item.endpoint); localStorage.setItem("myAlerts",JSON.stringify(updated)); loadList();
+        });
+        listEl.appendChild(div);
+      }
+    }
+    enableBtn.addEventListener("click", enable);
+    input.addEventListener("keydown", e=>{ if(e.key==="Enter") enable(); });
+    input.addEventListener("input", updateBtnState);
+    document.getElementById("refreshBtn").addEventListener("click", ()=>{ loadList(); updateBtnState(); });
+    loadList(); updateBtnState();
+    // theme toggle — connected to same localStorage as Chat/Study
+    const tBtnAlerts=document.getElementById("themeToggleAlerts");
+    function applyThemeAlerts(t){ document.documentElement.setAttribute("data-theme",t); localStorage.setItem("theme",t); if(tBtnAlerts) tBtnAlerts.textContent=t==="dark"?"☀":"◐"; }
+    if(tBtnAlerts) tBtnAlerts.addEventListener("click", ()=>{ const cur=document.documentElement.getAttribute("data-theme")||"light"; applyThemeAlerts(cur==="dark"?"light":"dark"); });
+    const savedAlerts=localStorage.getItem("theme"); if(savedAlerts) applyThemeAlerts(savedAlerts);
+    else if(window.matchMedia("(prefers-color-scheme: dark)").matches) applyThemeAlerts("dark");
+    // register SW for page itself
+    if("serviceWorker" in navigator){ navigator.serviceWorker.register("/sw.js").catch(()=>{}); }
+  </script>
+</body>
+</html>
