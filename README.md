@@ -2,12 +2,33 @@
 
 > **Ask in English or Hinglish, by text or voice — get GFS + ML-corrected forecasts, explore history, get proactive IMD alerts, and learn weather.**
 
+---
+
+## Smart India Hackathon 2026
+
+| | |
+|---|---|
+| **Problem Statement ID** | SIH26068 (S.No. 68) |
+| **Ministry** | Ministry of Earth Sciences (MoES) |
+| **Department** | India Meteorological Department (IMD) |
+| **Category & Theme** | Software - Disaster Management |
+| **Official Title** | WeatherGPT: Conversational AI for Weather Forecasting, Alerts, and Climate Information |
+| **GitHub** | [rajrounak21/WeatherGpt](https://github.com/rajrounak21/WeatherGpt) |
+
+### Background and Challenge
+
+Fragmented Weather Information Channels -- Weather information is often distributed through multiple portals, bulletins, satellite products, and forecast systems, making it difficult for common users, researchers, disaster managers, and government agencies to quickly obtain actionable insights.
+
+### Expected Solution
+
+Conversational Intelligence Platform -- Develop WeatherGPT: an intelligent conversational platform integrating meteorological datasets, forecasting models (GFS/WRF), disaster early warnings, location-based advisories, voice interaction for rural accessibility, and multilingual Indian language support.
+
 <p align="center">
   <img src="ui/weathergpt.png" alt="WeatherGPT" width="120" style="border-radius:16px" />
 </p>
 
 <p align="center">
-  <a href="#features">Features</a> • <a href="#architecture">Architecture</a> • <a href="#langgraph-flow">LangGraph</a> • <a href="#alert-system">Alerts</a> • <a href="#imd-whitelisting">IMD Access</a> • <a href="#model-training">Model</a> • <a href="#quick-start">Quick Start</a> • <a href="#api-reference">API</a>
+  <a href="#features">Features</a> - <a href="#architecture">Architecture</a> - <a href="#langgraph-flow">LangGraph</a> - <a href="#alert-system">Alerts</a> - <a href="#imd-whitelisting">IMD Access</a> - <a href="#model-training">Model</a> - <a href="#quick-start">Quick Start</a> - <a href="#api-reference">API</a>
 </p>
 
 ---
@@ -16,7 +37,7 @@
 
 | Feature | What it does | Tech |
 |---|---|---|
-| **1. AI Weather Agent** | `User → Groq LLM → weather_tool(location, forecast_time) → GFS + XGBoost (29.02°C corrected) → natural reply` in English/Hinglish + `Text + Voice` | `LangGraph`, `ChatGroq(openai/gpt-oss-20b)`, `tools/weather_tool.py`, `Groq Whisper + Orpheus` |
+| **1. AI Weather Agent** | `User -> Groq LLM -> weather_tool(location, forecast_time) -> GFS + XGBoost (32.5 C corrected) -> natural reply` in English/Hinglish + `Text + Voice` | `LangGraph`, `ChatGroq(openai/gpt-oss-20b)`, `tools/weather_tool.py`, `Groq Whisper + Orpheus`, XGBoost trained on [Arko007/weathergpt-d1-mos-dataset](https://huggingface.co/datasets/Arko007/weathergpt-d1-mos-dataset) |
 | **2. Proactive Alerts** | Worker monitors **IMD District/CAP** warnings in background → `MongoDB` dedup → `Web Push` even when site closed | `alerts/worker.py` + `alerts/providers/imd.py` + `MongoDB` + `pywebpush` |
 | **3. Weather History** | Past (`ERA5-Land` `1940→`) + Today + Future (`GFS+ML`) on one timeline — `Past / Today / Future` with `historical` vs `forecast` transparency | `history/providers/open_meteo.py` (`archive-api` + `api.open-meteo`) |
 | **4. Study Hub** | Learn → Explore → Quiz (5 Q ~2 min, supportive feedback) → AI explain (`Why does warm air rise?`) → Adaptive practice | `study_hub/content/topics.json` + `study_hub/router.py` + `Groq` teacher mode |
@@ -229,9 +250,22 @@ Integrated product: `WeatherGPT → Study → Learn why heavy rain happens` from
 
 ## Model Training — ipynb + pkl in `model/`
 
-**Files (`model/:1`):**
+**Dataset ([Arko007/weathergpt-d1-mos-dataset](https://huggingface.co/datasets/Arko007/weathergpt-d1-mos-dataset)):**
+```python
+from datasets import load_dataset
+
+ds = load_dataset("Arko007/weathergpt-d1-mos-dataset")
+# ds["train"] contains GFS forecasts vs ground-truth observations
+# across multiple Indian cities (lat/lon/elevation), each row is a
+# forecast hour with: GFS temperature, humidity, wind, lead_hours,
+# coordinates, elevation, UTC hour, month, valid_time, truth_temperature
+```
+
+The dataset pairs **GFS forecast runs** with **ground-truth observations** (Open-Meteo D1-MOS archive). Each sample has the 9 input features the model uses: `fc_temperature_2m_gfs_seamless`, `fc_relative_humidity_2m_gfs_seamless`, `fc_wind_speed_10m_gfs_seamless`, `lead_hours`, `lat`, `lon`, `elevation_m`, `hour_utc`, `month`. The label is `temperature_error = truth - GFS`, which the XGBoost model learns to predict.
+
+**Files (`model/`):**
 - `model/weathergpt_temperature_xgb.pkl` — **56 KB** XGBoost regressor that predicts `error = corrected - GFS`. Loaded in `inference.py:7` `pickle.load` → `model.predict(model_input)` → `corrected = GFS + predicted_error`.
-- `model/weathergpt_temperature_bias_correction_ipynb.ipynb` — full training code (Colab T4). Steps: `Open-Meteo bulk GFS archive + observations` → build dataset `datasets` with features `[gfs_temperature, relative_humidity, wind_speed, lead_hours, latitude, longitude, elevation, hour_utc, month]` → label `bias = obs - GFS` → split → `XGBoost` `max_depth 6, n_estimators 300` (<3.0, per `requirements.txt:4`) → export `weathergpt_temperature_xgb.pkl` + evaluate.
+- `model/weathergpt_temperature_bias_correction_ipynb.ipynb` — full training code (Colab T4). Steps: `load_dataset("Arko007/weathergpt-d1-mos-dataset")` → select features → compute `temperature_error = truth - GFS` → time-based train/val/test split (70/15/15) → `XGBRegressor` `n_estimators=500, max_depth=8, learning_rate=0.05` → export `weathergpt_temperature_xgb.pkl`.
 
 **Input to model (`inference.py:152`):**
 ```python
@@ -240,7 +274,7 @@ np.array([[gfs_temperature, relative_humidity, wind_speed,
            hour_utc, month]], dtype=np.float32)
 ```
 
-**Keep it on GitHub?** `*.pkl` is tiny, so simple is to `git add model/weathergpt_temperature_xgb.pkl` (works with `inference.py:7`). For larger future models, switch to `Git LFS` or host on `Hugging Face` and `curl` on deploy. The `*.ipynb` is **not needed at runtime** — keep it for reproducibility, but don't load it.
+**Keep it on GitHub?** `*.pkl` is tiny, so simple is to `git add model/weathergpt_temperature_xgb.pkl` (works with `inference.py:7`). The dataset lives on HuggingFace (`Arko007/weathergpt-d1-mos-dataset`), not in the repo. For larger future models, switch to `Git LFS` or host on HuggingFace and `curl` on deploy. The `*.ipynb` is **not needed at runtime** — keep it for reproducibility, but don't load it.
 
 Re-train: Open the `ipynb` in Colab, run all, download new `.pkl` to `model/` and restart `uvicorn`.
 
@@ -362,10 +396,11 @@ Notification click: `ui/sw.js:1` `push` → `showNotification(🚨 Orange Alert 
 
 *Name is literal file name (ipynb, not iptgb).* It contains:
 
-1.  **Data:** Open-Meteo `gfs_global` archive vs `observations` → parquet per location (`datasets` library, `era5` for history part). Example `Delhi` `d1_mos/loc_1252948.parquet`.
-2.  **Preprocess:** `lead_hours = (forecast_time - run_time)/3600`, `elevation` from `Open-Meteo elevation`, `hour_utc`, `month` added. Train/test split by time.
-3.  **Train:** `XGBRegressor` `xgboost<3.0`, `objective reg:squarederror`, evaluate `MAE` vs raw GFS, export `weathergpt_temperature_xgb.pkl` (the file loaded at runtime).
-4.  **Inference (`inference.py:7`):** `pickle.load` → `model.predict` on 9 features → add to `gfs_temperature`.
+1.  **Data:** `load_dataset("Arko007/weathergpt-d1-mos-dataset")` — 127 parquet files from Open-Meteo D1-MOS GFS archive vs ground-truth observations across Indian cities. Columns: `fc_temperature_2m_gfs_seamless`, `fc_relative_humidity_2m_gfs_seamless`, `fc_wind_speed_10m_gfs_seamless`, `lead_hours`, `lat`, `lon`, `elevation_m`, `hour_utc`, `month`, `valid_time`, `truth_temperature_2m`.
+2.  **Label:** `temperature_error = truth_temperature_2m - fc_temperature_2m_gfs_seamless` (model predicts the GFS bias, not absolute temperature).
+3.  **Split:** Time-based 70/15/15 (train/val/test) — no data leakage from future into training.
+4.  **Train:** `XGBRegressor` `n_estimators=500, max_depth=8, learning_rate=0.05, subsample=0.8, colsample_bytree=0.8, objective="reg:squarederror"`, evaluate MAE vs raw GFS, export `weathergpt_temperature_xgb.pkl`.
+5.  **Inference (`inference.py:7`):** `pickle.load` → `model.predict` on 9 features → `corrected = gfs_temperature + predicted_error`.
 
 To re-train, open the `ipynb` in Colab (T4), `Runtime → Run all`, download the new `.pkl` to `model/` and commit (small) or use `Git LFS` if larger.
 
