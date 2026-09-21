@@ -89,7 +89,7 @@ WeatherGpt/
 │   └── weathergpt.png / favicon.ico / icon-180.png  # favicon + push icon/badge
 ├── requirements.txt
 ├── .env.example
-└──
+└── .env                        # not committed (see Quick Start)
 ```
 
 ---
@@ -100,15 +100,15 @@ Normal Agent (conversation-driven). **Alert System does NOT use LangGraph** — 
 
 ```mermaid
 graph TD
-    A[User: "Kal Patna me mausam kaisa rahega?"] --> B[LangGraph Agent<br/>ChatGroq openai/gpt-oss-20b<br/>system: prompts.py]
-    B --> C{Tool call?}
-    C -->|get_weather_tool<br/>location=Patna<br/>forecast_time=tomorrow| D[tools/weather_tool.py<br/>IST target 12:00 → forecast_hours]
-    D --> E[inference.py<br/>geocode → GFS run → forecast_hours → hourly[temperature_2m, humidity, wind]]
-    E --> F[XGBoost<br/>model/weathergpt_temperature_xgb.pkl<br/>predict error → corrected_temperature]
-    F --> G[Tool result<br/>corrected_temperature 32.5°C<br/>humidity 49% wind 5.2]
+    A["User: Kal Patna me mausam kaisa rahega"] --> B["LangGraph Agent<br/>ChatGroq openai/gpt-oss-20b<br/>system prompts.py"]
+    B --> C{"Tool call?"}
+    C -->|"get_weather_tool<br/>location=Patna<br/>forecast_time=tomorrow"| D["tools/weather_tool.py<br/>IST target 12:00 to forecast_hours"]
+    D --> E["inference.py<br/>geocode to GFS run to forecast_hours to hourly"]
+    E --> F["XGBoost<br/>model weathergpt_temperature_xgb.pkl<br/>predict error to corrected_temperature"]
+    F --> G["Tool result<br/>corrected_temperature 32.5C<br/>humidity 49% wind 5.2"]
     G --> B
-    B --> H[Groq LLM<br/>natural reply<br/>Hinglish/English]
-    H --> I[Text + Voice<br/>services/tts.py<br/>Orpheus wav]
+    B --> H["Groq LLM<br/>natural reply<br/>Hinglish/English"]
+    H --> I["Text + Voice<br/>services/tts.py<br/>Orpheus wav"]
 ```
 
 **StateGraph (`agent/graph.py:17`):**
@@ -149,12 +149,12 @@ Background Worker (main.py:on_startup → alerts/worker.py:start_scheduler() eve
 **Normal Agent vs Alert System:**
 ```mermaid
 graph TD
-    U[User] -->|asks| A[Agent<br/>GFS+XGB → reply]
-    I[IMD] --> W[Worker<br/>every 15 min<br/>IMD → normalize]
-    W --> D{deduplicate<br/>processed_warnings}
-    D -->|new| M[MongoDB find district subs]
-    M --> P[Web Push]
-    P --> U2[🔔 Browser<br/>even when site closed]
+    U["User"] -->|"asks"| A["Agent<br/>GFS+XGB to reply"]
+    I["IMD"] --> W["Worker<br/>every 15 min<br/>IMD to normalize"]
+    W --> D{"deduplicate<br/>processed_warnings"}
+    D -->|"new"| M["MongoDB find district subs"]
+    M --> P["Web Push"]
+    P --> U2["Browser<br/>even when site closed"]
 ```
 
 **MongoDB Collections (`alerts/db.py:1`):**
