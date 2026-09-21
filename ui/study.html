@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Study Hub — WeatherGPT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" sizes="32x32" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .studyPage{max-width:1100px;margin:0 auto;padding:24px 20px}
+    @media(max-width:900px){.studyPage{max-width:900px;padding:20px 16px}}
+    .heroStudy{text-align:center;padding:18px 0 12px}
+    .heroStudy h1{font-size:28px;font-weight:800;letter-spacing:-0.04em;margin:0}
+    .heroStudy p{color:var(--muted);font-size:13px;margin:6px 0 0}
+    .ctaPrimary{margin-top:14px;padding:10px 18px;border-radius:10px;border:1px solid #0f172a;background:#0f172a;color:#fff;font-weight:600;font-size:13px;cursor:pointer}
+    .cardGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:16px}
+    @media(min-width:600px){.cardGrid{grid-template-columns:repeat(2,1fr)}}
+    @media(min-width:960px){.cardGrid{grid-template-columns:repeat(4,1fr)}}
+    .sCard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;cursor:pointer;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;transition:transform .18s, box-shadow .18s, border-color .18s}
+    .sCard:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(15,23,42,.08);border-color:#0ea5e9}
+    .sCard::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#0ea5e9,#22d3ee);opacity:.9}
+    .sIcon{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:16px;margin-bottom:8px;background:var(--bg);border:1px solid var(--border)}
+    .sTitle{font-weight:800;font-size:14px;letter-spacing:-0.01em}
+    .sDesc{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5}
+    .lessonWrap{max-width:680px;margin:0 auto;padding:16px}
+    .lessonTop{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+    .progress{height:6px;background:var(--border);border-radius:999px;overflow:hidden;margin-top:8px}
+    .progressBar{height:100%;background:#0ea5e9;transition:width .3s}
+    .lessonCard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-top:14px}
+    .lessonTitle{font-weight:800;font-size:16px}
+    .lessonBody{font-size:13px;line-height:1.6;color:var(--text);margin-top:8px;white-space:pre-wrap}
+    .keyIdea{margin-top:12px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:10px;font-size:12px}
+    [data-theme="dark"] .keyIdea{background:#0c1a2e;border-color:#1e3a5f}
+    .navBtns{display:flex;justify-content:space-between;margin-top:14px}
+    .btn{padding:9px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-size:12px;cursor:pointer}
+    .btnPrimary{padding:9px 14px;border-radius:10px;border:1px solid #0f172a;background:#0f172a;color:#fff;font-size:12px;cursor:pointer}
+    .quizIntro{text-align:center;padding:20px;background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-top:14px}
+    .quizQ{font-weight:700;font-size:15px;margin-top:10px}
+    .opts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+    .opt{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-size:13px;cursor:pointer;text-align:left;color:var(--text)}
+    .opt.selected{border-color:#0ea5e9;background:#f0f9ff}
+    [data-theme="dark"] .opt.selected{background:#0c1a2e;color:#e2e8f0}
+    .opt.correct{border-color:#16a34a;background:#f0fdf4;color:#14532d}
+    [data-theme="dark"] .opt.correct{background:#052e16;color:#bbf7d0;border-color:#16a34a}
+    .opt.wrong{border-color:#ef4444;background:#fef2f2;color:#7f1d1d}
+    [data-theme="dark"] .opt.wrong{background:#450a0a;color:#fecaca;border-color:#ef4444}
+    .quizQ{color:var(--text)}
+    .lessonTitle{color:var(--text)}
+    .feedback{margin-top:12px;padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--surface)}
+    .feedback.correct{border-color:#16a34a}
+    .feedback.wrong{border-color:#f59e0b}
+    .resultHead{text-align:center;padding:22px;background:var(--surface);border:1px solid var(--border);border-radius:16px;margin-top:14px}
+    .resultHead h3{color:var(--text)}
+    .dots{display:flex;gap:6px;justify-content:center;margin-top:10px}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--border)}
+    .dot.fill{background:#0ea5e9}
+    [data-theme="dark"] .resultHead{background:radial-gradient(600px 200px at 50% 0%, rgba(14,165,233,.18), transparent 70%), #111a2e;border-color:#1e293b;color:#e2e8f0}
+    [data-theme="dark"] .resultHead .btn{background:#334155;border-color:#475569;color:#f1f5f9}
+    [data-theme="dark"] .resultHead .btn:hover{background:#475569}
+    [data-theme="dark"] .resultHead .btnPrimary{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
+    [data-theme="dark"] #resultScore{color:#f1f5f9}
+    [data-theme="dark"] #resultTitle{color:#f1f5f9}
+    [data-theme="dark"] #resultMsg{color:#cbd5e1}
+    .exploreGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:14px}
+    .expCard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;cursor:pointer}
+    .expCard:hover{border-color:#0ea5e9}
+    /* Night theme fixes — ensure text visible */
+    [data-theme="dark"] .heroStudy h1{color:#f1f5f9}
+    [data-theme="dark"] .sTitle,[data-theme="dark"] .lessonTitle,[data-theme="dark"] .quizQ{color:#f1f5f9}
+    [data-theme="dark"] .sCard,[data-theme="dark"] .lessonCard,[data-theme="dark"] .quizIntro,[data-theme="dark"] .resultHead,[data-theme="dark"] .expCard{color:#e2e8f0}
+    [data-theme="dark"] .btn{background:#1e293b;border-color:#334155;color:#e2e8f0}
+    [data-theme="dark"] .btn:hover{background:#334155}
+    [data-theme="dark"] .feedback{background:#111a2e;color:#e2e8f0;border-color:#334155}
+    [data-theme="dark"] .feedback.correct{background:#052e16;border-color:#16a34a;color:#bbf7d0}
+    [data-theme="dark"] .feedback.wrong{background:#450a0a;border-color:#f59e0b;color:#fed7aa}
+  </style>
+</head>
+<body>
+  <div class="bgGlow"></div>
+  <div class="appShell">
+    <aside class="sidebar" id="sidebar">
+      <div class="sideTop">
+        <div class="sideBrand">
+          <img src="weathergpt.png" alt="WeatherGPT" style="width:24px;height:24px;border-radius:6px;object-fit:cover;flex-shrink:0" />
+          <span class="sideName">WeatherGPT</span>
+          <button id="sidebarClose" class="sidebarClose" aria-label="Toggle sidebar" title="Toggle sidebar"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg></button>
+        </div>
+        <button id="newChatBtn" class="newChatBtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></svg></span> <span class="text">New Chat</span></button>
+        <nav class="sideNav">
+          <a href="/" class="sideLink"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg></span> <span class="text">Chat</span></a>
+          <a href="/history.html" class="sideLink"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l2 2"/></svg></span> <span class="text">History</span></a>
+          <a href="/alerts.html" class="sideLink"><span class="icon" style="position:relative"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6"/><path d="M9 17v1a3 3 0 0 0 6 0v-1"/><path d="M12 9v3"/><path d="M12 14.5v.01"/></svg><span id="alertBadge" class="alertBadge hidden"></span></span> <span class="text">Alerts</span></a>
+          <a href="/study.html" class="sideLink active"><span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span> <span class="text">Study</span></a>
+        </nav>
+      </div>
+      <div class="sideFoot"><span class="footText">AI · GFS + XGBoost · Voice</span></div>
+    </aside>
+    <div id="sidebarOverlay" class="sidebarOverlay hidden"></div>
+    <div class="mainCol">
+  <header class="topbar">
+    <div class="topbarInner">
+      <div class="brandRow">
+        <button id="sidebarOpen" class="iconBtn" aria-label="Open sidebar" title="Toggle sidebar"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg></button>
+        <a href="/" class="brandLink">
+          <img src="weathergpt.png" alt="WeatherGPT" style="width:26px;height:26px;border-radius:6px;object-fit:cover;flex-shrink:0" />
+          <span class="brandName">WeatherGPT</span>
+          <span class="brandBadge">INDIA</span>
+        </a>
+      </div>
+      <div class="topActions">
+        <a href="/" class="topLink">Chat</a>
+        <a href="/history.html" class="topLink">History</a>
+        <a href="/alerts.html" class="topLink">Alerts</a>
+        <a href="/study.html" class="topLink active">Study</a>
+        <button id="themeToggleStudy" class="iconBtn" aria-label="Toggle theme" title="Toggle theme">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="studyPage">
+    <!-- HOME -->
+    <section id="homeView">
+      <div class="heroStudy" style="background:radial-gradient(600px 200px at 50% 0%, rgba(14,165,233,.12), transparent 70%), var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px">
+        <h1>Learn the Weather</h1>
+        <p>Understand the weather around you. Learn → Explore → Test yourself</p>
+        <button class="ctaPrimary" id="startLearning">Start Learning</button>
+      </div>
+      <div id="continueCard" class="lessonCard" style="display:none"></div>
+      <div style="margin-top:18px;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:800;font-size:14px;letter-spacing:-0.01em">Explore Weather</span><span style="font-size:11px;color:var(--muted)">4 topics • tap to start</span></div>
+      <div id="topicsGrid" class="cardGrid"></div>
+    </section>
+
+    <!-- LEARN -->
+    <section id="learnView" class="hidden">
+      <div class="lessonWrap">
+        <div class="lessonTop"><button id="backHome" class="btn">← Back</button><span id="lessonProgress">1 / 3</span></div>
+        <div class="progress"><div id="progressBar" class="progressBar" style="width:33%"></div></div>
+        <div id="lessonCard" class="lessonCard"></div>
+        <div class="navBtns"><button id="prevBtn" class="btn">Back</button><button id="nextBtn" class="btnPrimary">Continue →</button></div>
+        <div id="explainBox" class="lessonCard" style="display:none"></div>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <button class="btn" data-explain="simple">Explain simply</button>
+          <button class="btn" data-explain="example">Give me an example</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ INTRO -->
+    <section id="quizIntro" class="hidden">
+      <div class="quizIntro">
+        <div style="font-size:13px;color:var(--muted)">Quick Weather Check</div>
+        <div style="font-weight:800;margin-top:4px" id="quizTopic">Thunderstorms</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px" id="quizMeta">5 Questions · ~2 min · Beginner ●●○○○</div>
+        <button id="startQuizBtn" class="ctaPrimary" style="margin-top:12px">Start Quiz</button>
+      </div>
+    </section>
+
+    <!-- QUIZ Q -->
+    <section id="quizView" class="hidden">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)"><button id="exitQuiz" class="btn">← Exit</button><span id="qProgress">2 / 5</span></div>
+      <div class="progress"><div id="qProgressBar" class="progressBar" style="width:40%"></div></div>
+      <div id="questionCard" class="lessonCard"></div>
+      <div style="margin-top:10px;text-align:right"><button id="checkBtn" class="btnPrimary">Check Answer</button></div>
+      <div id="feedback" class="feedback hidden"></div>
+      <div style="margin-top:10px;text-align:right"><button id="nextQBtn" class="btnPrimary hidden">Next Question →</button></div>
+    </section>
+
+    <!-- RESULT -->
+    <section id="resultView" class="hidden">
+      <div class="resultHead" style="background:radial-gradient(600px 200px at 50% 0%, rgba(14,165,233,.15), transparent 70%), var(--surface);">
+        <div style="width:48px;height:48px;margin:0 auto;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#22d3ee);display:grid;place-items:center;color:#fff;font-size:20px">✓</div>
+        <div style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:10px">Weather • Learn</div>
+        <div style="font-size:32px;font-weight:800;letter-spacing:-0.03em;margin-top:4px" id="resultScore">5 / 5</div>
+        <div style="font-size:14px;font-weight:600;margin-top:2px" id="resultTitle">Perfect — you nailed it!</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;max-width:420px;margin-left:auto;margin-right:auto" id="resultMsg">You understood this topic really well. Ready for the next one?</div>
+        <div id="resultDots" class="dots"></div>
+        <div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button id="anotherBtn" class="btnPrimary" style="min-width:140px">Try Another Topic</button><button id="reviewBtn" class="btn" style="min-width:140px">Review Mistakes</button></div>
+      </div>
+      <div id="mistakeList" style="margin-top:14px"></div>
+    </section>
+  </main>
+
+  <script>
+    // ── Sidebar logic ──────────────────────────────────────────────
+    (function(){
+      const sidebar=document.getElementById("sidebar"), overlay=document.getElementById("sidebarOverlay");
+      const openBtn=document.getElementById("sidebarOpen"), closeBtn=document.getElementById("sidebarClose");
+      function updateHamburger(){
+        if(!sidebar || !openBtn) return;
+        const isCollapsed=sidebar.classList.contains("collapsed");
+        const isDesktop=window.innerWidth>=860;
+        if(isDesktop){ openBtn.style.display=isCollapsed?"grid":"none"; openBtn.style.visibility=isCollapsed?"visible":"hidden"; }
+        else { openBtn.style.display="grid"; openBtn.style.visibility="visible"; }
+      }
+      function set(open){
+        if(!sidebar) return;
+        const isMobile=window.innerWidth<860;
+        if(isMobile){ sidebar.classList.toggle("collapsed", !open); overlay.classList.toggle("hidden", !open); }
+        else { sidebar.classList.toggle("collapsed", !open); localStorage.setItem("sidebarOpen", open?"1":"0"); }
+        updateHamburger();
+      }
+      if(openBtn) openBtn.addEventListener("click", ()=>set(true));
+      if(closeBtn) closeBtn.addEventListener("click", ()=>{ const c=sidebar.classList.contains("collapsed"); set(c); });
+      if(overlay) overlay.addEventListener("click", ()=>set(false));
+      const saved=localStorage.getItem("sidebarOpen");
+      if(window.innerWidth>=860 && saved==="0") sidebar?.classList.add("collapsed");
+      else if(window.innerWidth<860){ sidebar?.classList.add("collapsed"); overlay?.classList.add("hidden"); }
+      updateHamburger();
+      window.addEventListener("resize", updateHamburger);
+      const nb=document.getElementById("newChatBtn"); if(nb) nb.addEventListener("click", ()=>window.location.href="/");
+    })();
+    // ──────────────────────────────────────────────────────────────
+    let topics=[], currentTopic=null, lessonIdx=0, quizIdx=0, quizQs=[], selectedOpt=null, answers={}, quizScore=0;
+
+    async function loadTopics(){
+      const r=await fetch("/api/study/topics"); const j=await r.json(); topics=j.topics||[];
+      renderHome();
+    }
+    function renderHome(){
+      const grid=document.getElementById("topicsGrid"); grid.innerHTML="";
+      const icons={thunderstorms:"⛈",rain:"🌧",humidity:"💧",heatwave:"☀",storm:"⛈",droplet:"💧",sun:"☀"};
+      for(const t of topics){
+        const div=document.createElement("div"); div.className="sCard";
+        const prog=parseInt(localStorage.getItem("study_"+t.id)||"0");
+        const ic=icons[t.icon]||icons[t.id]||"🌦";
+        const pctLabel = prog? `${prog}%` : "Start";
+        div.innerHTML=`<div class="sIcon">${ic}</div><div class="sTitle">${t.title}</div><div class="sDesc">${t.description}</div><div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted)"><span>${t.lessons.length} lessons · ${t.quiz.length} Q</span><span style="color:#0ea5e9;font-weight:600">${pctLabel} →</span></div><div style="margin-top:6px;height:6px;background:var(--border);border-radius:999px;overflow:hidden"><div style="width:${prog}%;height:100%;background:linear-gradient(90deg,#0ea5e9,#22d3ee)"></div></div>`;
+        div.addEventListener("click",()=> openLearn(t.id));
+        grid.appendChild(div);
+      }
+      // continue card
+      let maxProg=null, maxId=null;
+      for(const t of topics){ const p=parseInt(localStorage.getItem("study_"+t.id)||"0"); if(p>0 && p<100 && (!maxProg || p>maxProg.prog)){ maxProg={prog:p,topic:t}; }}
+      const cont=document.getElementById("continueCard");
+      if(maxProg){ cont.style.display="block"; cont.innerHTML=`<div style="font-weight:700">${maxProg.topic.title}</div><div style="height:6px;background:var(--border);border-radius:999px;margin-top:8px;overflow:hidden"><div style="width:${maxProg.prog}%;height:100%;background:#0ea5e9"></div></div><div style="margin-top:8px"><button class="btnPrimary" onclick="openLearn('${maxProg.topic.id}')">Continue →</button></div>`; } else cont.style.display="none";
+    }
+    function showView(id){
+      ["homeView","learnView","quizIntro","quizView","resultView"].forEach(v=> document.getElementById(v).classList.add("hidden"));
+      document.getElementById(id).classList.remove("hidden");
+    }
+    window.openLearn=(id)=>{
+      const t=topics.find(x=>x.id===id); if(!t) return; currentTopic=t; lessonIdx=0; showView("learnView"); renderLesson();
+    }
+    function renderLesson(){
+      const l=currentTopic.lessons[lessonIdx];
+      document.getElementById("lessonProgress").textContent=`${lessonIdx+1} / ${currentTopic.lessons.length}`;
+      document.getElementById("progressBar").style.width=`${((lessonIdx+1)/currentTopic.lessons.length)*100}%`;
+      document.getElementById("lessonCard").innerHTML=`<div class="lessonTitle">${l.title}</div><div class="lessonBody">${l.body}</div>${l.visual? `<div style="margin-top:10px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--muted)">Visual: ${l.visual}</div>`:""}${l.key_idea? `<div class="keyIdea"><b>Key idea:</b> ${l.key_idea}</div>`:""}`;
+      document.getElementById("explainBox").style.display="none";
+      document.getElementById("prevBtn").style.visibility= lessonIdx===0?"hidden":"visible";
+      document.getElementById("nextBtn").textContent= lessonIdx===currentTopic.lessons.length-1? "Start Quiz →" : "Continue →";
+    }
+    document.getElementById("nextBtn").addEventListener("click",()=>{
+      if(lessonIdx < currentTopic.lessons.length-1){ lessonIdx++; renderLesson(); }
+      else {
+        // save progress 70% after lessons
+        localStorage.setItem("study_"+currentTopic.id, "70");
+        // quiz intro
+        document.getElementById("quizTopic").textContent=currentTopic.title;
+        document.getElementById("quizMeta").textContent=`${currentTopic.quiz.length} Questions · ~2 min · Beginner`;
+        showView("quizIntro");
+      }
+    });
+    document.getElementById("prevBtn").addEventListener("click",()=>{ if(lessonIdx>0){ lessonIdx--; renderLesson(); }});
+    document.getElementById("backHome").addEventListener("click",()=>{ showView("homeView"); });
+    document.getElementById("startLearning").addEventListener("click",()=>{ if(topics[0]) openLearn(topics[0].id); });
+    // explain
+    function cleanStars(t){ return t.replace(/\*\*/g,"").replace(/\*/g,"").replace(/^\s*-\s*/gm,"").trim(); }
+    document.querySelectorAll("[data-explain]").forEach(b=> b.addEventListener("click", async()=>{
+      const mode=b.dataset.explain;
+      const box=document.getElementById("explainBox");
+      box.style.display="block"; box.innerHTML="WeatherGPT explains...";
+      try{
+        const r=await fetch("/api/study/explain",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({topic_id:currentTopic.id, question: currentTopic.lessons[lessonIdx].title, mode})});
+        const j=await r.json(); const clean=cleanStars(j.answer||"");
+        box.innerHTML=`<b>WeatherGPT explains</b><div style="margin-top:6px;white-space:pre-wrap">${clean}</div>`;
+      }catch(e){ box.innerHTML="Try again."; }
+    }));
+    // quiz
+    document.getElementById("startQuizBtn").addEventListener("click",()=>{
+      quizIdx=0; answers={}; selectedOpt=null;
+      showView("quizView"); renderQuestion();
+    });
+    document.getElementById("exitQuiz").addEventListener("click",()=> showView("quizIntro"));
+    function renderQuestion(){
+      const q=currentTopic.quiz[quizIdx];
+      document.getElementById("qProgress").textContent=`${quizIdx+1} / ${currentTopic.quiz.length}`;
+      document.getElementById("qProgressBar").style.width=`${((quizIdx+1)/currentTopic.quiz.length)*100}%`;
+      const card=document.getElementById("questionCard");
+      card.innerHTML=`<div style="font-size:12px;color:var(--muted)">${currentTopic.title}</div><div class="quizQ">${q.text}</div><div class="opts">${q.options.map((o,i)=> `<button class="opt" data-i="${i}">${String.fromCharCode(65+i)}. ${o}</button>`).join("")}</div>`;
+      selectedOpt=null;
+      document.getElementById("feedback").classList.add("hidden");
+      document.getElementById("nextQBtn").classList.add("hidden");
+      document.getElementById("checkBtn").classList.remove("hidden");
+      card.querySelectorAll(".opt").forEach(b=>{
+        b.addEventListener("click",()=>{
+          card.querySelectorAll(".opt").forEach(x=>x.classList.remove("selected"));
+          b.classList.add("selected"); selectedOpt=parseInt(b.dataset.i);
+        });
+      });
+    }
+    document.getElementById("checkBtn").addEventListener("click",()=>{
+      if(selectedOpt===null) return;
+      const q=currentTopic.quiz[quizIdx];
+      const isCorrect = selectedOpt===q.correct;
+      const opts=document.querySelectorAll("#questionCard .opt");
+      opts.forEach((b,i)=>{
+        if(i===q.correct) b.classList.add("correct");
+        else if(i===selectedOpt && !isCorrect) b.classList.add("wrong");
+        b.disabled=true;
+      });
+      const fb=document.getElementById("feedback");
+      fb.classList.remove("hidden");
+      if(isCorrect){
+        fb.className="feedback correct";
+        fb.innerHTML=`<b>Correct</b><div style="margin-top:6px">${q.why}</div><div style="margin-top:8px;font-size:11px;color:var(--muted)">Weather connection: This warm, moist air helps thunderstorms develop.</div>`;
+      } else {
+        fb.className="feedback wrong";
+        fb.innerHTML=`<b>Almost! Let's understand it.</b><div style="margin-top:6px">You selected: <em>${q.options[selectedOpt]}</em></div><div style="margin-top:6px">Better answer: <b>${q.options[q.correct]}</b></div><div style="margin-top:6px;font-size:12px"><b>Why?</b> ${q.why}</div><div style="margin-top:6px;font-size:11px;color:var(--muted)">${q.misconception||""}</div>`;
+      }
+      answers[q.id]=selectedOpt;
+      document.getElementById("checkBtn").classList.add("hidden");
+      document.getElementById("nextQBtn").classList.remove("hidden");
+    });
+    document.getElementById("nextQBtn").addEventListener("click",()=>{
+      if(quizIdx < currentTopic.quiz.length-1){ quizIdx++; renderQuestion(); }
+      else {
+        // submit
+        submitQuiz();
+      }
+    });
+    async function submitQuiz(){
+      const r=await fetch("/api/study/quiz/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({topic_id:currentTopic.id, answers})});
+      const j=await r.json();
+      showResult(j);
+    }
+    function showResult(j){
+      showView("resultView");
+      document.getElementById("resultScore").textContent=`${j.correct} / ${j.total}`;
+      const titleEl=document.getElementById("resultTitle");
+      if(j.correct===j.total){
+        titleEl.textContent="Perfect — you nailed it!";
+        document.getElementById("resultMsg").textContent="You understood this topic really well. Ready for the next one?";
+      } else if(j.correct===0){
+        titleEl.textContent="Keep going — let's review";
+        document.getElementById("resultMsg").textContent="Not quite this time. Review the key idea and try again — you'll get it.";
+      } else if(j.correct>=Math.ceil(j.total*0.6)){
+        titleEl.textContent="Good effort — almost there!";
+        document.getElementById("resultMsg").textContent="You understood most of this topic. Review the missed one.";
+      } else {
+        titleEl.textContent="Keep practicing — you'll get it";
+        document.getElementById("resultMsg").textContent="Review the explanation and try a new question.";
+      }
+      const dots=document.getElementById("resultDots"); dots.innerHTML="";
+      for(let i=0;i<j.total;i++){ const d=document.createElement("div"); d.className="dot"+(i<j.correct?" fill":""); dots.appendChild(d); }
+      const list=document.getElementById("mistakeList"); list.innerHTML="";
+      const mistakes=j.details.filter(d=>!d.is_correct);
+      const understood=j.details.filter(d=>d.is_correct);
+      if(j.correct===j.total){
+        list.innerHTML=`<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px"><div style="font-weight:700;font-size:13px;color:var(--text)">What you nailed</div><div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">`+j.details.map(d=>{
+          const q=currentTopic.quiz.find(x=>x.id===d.id);
+          return `<div style="display:flex;gap:8px;align-items:center;font-size:12px"><span style="width:20px;height:20px;border-radius:50%;background:#16a34a;color:#fff;display:grid;place-items:center;font-size:11px">✓</span><span style="color:var(--text)">${q.text}</span></div>`;
+        }).join("")+`</div><div style="margin-top:10px;font-size:11px;color:var(--muted)">Perfect score — you understand this topic. Try another to keep the streak.</div></div>`;
+      } else if(mistakes.length){
+        list.innerHTML=`<div style="font-weight:700;font-size:13px;margin-bottom:8px;color:var(--text)">Worth reviewing</div>`+mistakes.map(m=>{
+          const q=currentTopic.quiz.find(x=>x.id===m.id);
+          return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px"><div style="font-size:12px;font-weight:600;color:var(--text)">${q.text}</div><div style="font-size:12px;margin-top:4px;color:var(--text)">Your: <span style="color:#dc2626">${q.options[m.selected]}</span> → Correct: <span style="color:#16a34a">${q.options[m.correct]}</span></div><div style="font-size:11px;color:var(--muted);margin-top:4px">${m.why}</div><button class="btn" onclick="practiceAgain('${m.id}')" style="margin-top:6px">Practice again</button><div id="practiceArea-${m.id}"></div></div>`;
+        }).join("")+ (understood.length? `<div style="margin-top:10px;font-weight:700;font-size:13px;color:var(--text)">What you got right</div><div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">`+understood.map(d=>{
+          const q=currentTopic.quiz.find(x=>x.id===d.id);
+          return `<div style="font-size:12px;color:var(--muted)">✓ ${q.text}</div>`;
+        }).join("")+`</div>`:"");
+      } else {
+        list.innerHTML=`<div style="font-size:12px;color:var(--muted)">All understood — try another topic.</div>`;
+      }
+      localStorage.setItem("study_"+currentTopic.id, j.correct===j.total? "100" : "85");
+    }
+    // inline practice — no alert, no raw JSON
+    function tryParseJsonString(s){
+      if(typeof s!=="string") return null;
+      // if it's a JSON string like '{"text":"..."}', parse it
+      s=s.trim();
+      if(s.startsWith("{") && s.includes('"text"')){
+        try{ return JSON.parse(s); }catch(e){
+          try{ return JSON.parse(s.replace(/'/g,'"')); }catch(e2){
+            // regex extract
+            const m=s.match(/"text"\s*:\s*"([^"]+)"/);
+            const om=s.match(/"options"\s*:\s*\[(.*?)\]/s);
+            if(m){
+              const opts= om? [...om[1].matchAll(/"([^"]+)"/g)].map(x=>x[1]): null;
+              const cm=s.match(/"correct"\s*:\s*(\d)/);
+              const wm=s.match(/"why"\s*:\s*"([^"]+)"/);
+              return {text:m[1], options: opts, correct: cm?parseInt(cm[1]):0, why: wm?wm[1]:""};
+            }
+          }
+        }
+      }
+      return null;
+    }
+    window.practiceAgain=async(id)=>{
+      const holder=document.getElementById("practiceArea-"+id);
+      if(!holder) return;
+      holder.innerHTML="<div style='padding:10px;font-size:12px;color:var(--muted)'>Generating a new question...</div>";
+      try{
+        const q=currentTopic.quiz.find(x=>x.id===id);
+        const r=await fetch("/api/study/quiz/practice-again",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({topic_id:currentTopic.id, question:q.text, mode:"simple"})});
+        const j=await r.json();
+        let nq=j.question;
+        // if backend returned stringified JSON, parse it
+        if(typeof nq==="string"){
+          const parsed=tryParseJsonString(nq);
+          if(parsed) nq=parsed;
+        }
+        let text, opts, correct, why;
+        if(typeof nq==="string"){
+          text=nq.replace(/\*\*/g,"").replace(/\*/g,"").trim(); opts=["It rises above the cooler air","It sinks below","It stops","It becomes snow"]; correct=0; why="";
+        } else {
+          text=(nq.text||nq.question||"Practice question").replace(/\*\*/g,"").replace(/\*/g,"").trim();
+          opts=nq.options||["A","B","C","D"];
+          correct=nq.correct!=null? nq.correct:0;
+          why=nq.why||"";
+        }
+        holder.innerHTML=`<div style="margin-top:8px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--bg)"><div style="font-weight:700;font-size:13px;color:var(--text)">${text}</div><div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">${opts.map((o,i)=> `<button class="opt practiceOpt" data-i="${i}">${String.fromCharCode(65+i)}. ${o}</button>`).join("")}</div><div id="practiceFeedback-${id}" style="margin-top:8px;font-size:12px"></div></div>`;
+        holder.querySelectorAll(".practiceOpt").forEach(b=>{
+          b.addEventListener("click",()=>{
+            const sel=parseInt(b.dataset.i);
+            holder.querySelectorAll(".practiceOpt").forEach(x=>x.classList.remove("selected","correct","wrong"));
+            b.classList.add("selected");
+            // mark correct/wrong
+            holder.querySelectorAll(".practiceOpt").forEach((x,i)=>{
+              if(i===correct) x.classList.add("correct");
+              else if(i===sel && sel!==correct) x.classList.add("wrong");
+              x.disabled=true;
+            });
+            const fb=document.getElementById("practiceFeedback-"+id);
+            if(sel===correct) fb.innerHTML=`<b style="color:#16a34a">Correct!</b> ${why}`;
+            else fb.innerHTML=`<b>Almost.</b> Correct is <b>${opts[correct]}</b><div style="margin-top:4px">${why}</div>`;
+          });
+        });
+      }catch(e){ holder.innerHTML="<div style='color:#dc2626;font-size:12px'>Failed to generate. Try again.</div>"; }
+    }
+    document.getElementById("reviewBtn")?.addEventListener("click",()=>{
+      // scroll to mistakes
+      document.getElementById("mistakeList").scrollIntoView({behavior:"smooth"});
+    });
+    document.getElementById("anotherBtn").addEventListener("click",()=> showView("homeView"));
+    // theme init
+    const tBtn=document.getElementById("themeToggleStudy");
+    function applyTheme(t){ document.documentElement.setAttribute("data-theme",t); localStorage.setItem("theme",t); if(tBtn) tBtn.textContent=t==="dark"?"☀":"◐"; }
+    if(tBtn) tBtn.addEventListener("click",()=>{ const cur=document.documentElement.getAttribute("data-theme")||"light"; applyTheme(cur==="dark"?"light":"dark"); });
+    const saved=localStorage.getItem("theme"); if(saved) applyTheme(saved);
+    loadTopics();
+  </script>
+</body>
+</html>

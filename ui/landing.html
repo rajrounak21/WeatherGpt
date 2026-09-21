@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WeatherGPT — Your AI Weather Assistant for India</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.ico" sizes="32x32" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .landingPage{max-width:1100px;margin:0 auto;padding:0 16px 40px}
+    .landingHero{margin-top:18px;display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center;background:radial-gradient(900px 400px at 20% 0%, rgba(14,165,233,.18), transparent 60%), radial-gradient(700px 300px at 90% 20%, rgba(99,102,241,.12), transparent 60%), var(--surface);border:1px solid var(--border);border-radius:24px;padding:28px;box-shadow:0 20px 60px rgba(15,23,42,.08);overflow:hidden}
+    @media(max-width:860px){.landingHero{grid-template-columns:1fr; padding:20px}}
+    .heroLeft h1{font-size:42px;font-weight:900;letter-spacing:-0.04em;margin:0;line-height:1.05}
+    @media(max-width:640px){.heroLeft h1{font-size:32px}}
+    .heroLeft p{color:var(--muted);font-size:15px;margin:12px 0 0;line-height:1.6;max-width:520px}
+    .heroActions{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap}
+    .launchBtn{padding:13px 22px;border-radius:12px;border:1px solid #0f172a;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 8px 20px rgba(15,23,42,.15);text-decoration:none;transition:transform .15s, box-shadow .15s}
+    .launchBtn:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(15,23,42,.2)}
+    [data-theme="dark"] .launchBtn{background:linear-gradient(135deg,#38bdf8,#0ea5e9);border-color:#38bdf8;color:#020617}
+    .ghostBtn{padding:11px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface);font-size:13px;cursor:pointer;color:var(--text);text-decoration:none;display:inline-flex;align-items:center;font-weight:500}
+    .ghostBtn:hover{border-color:#0ea5e9}
+    .heroMock{background:var(--bg);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 12px 40px rgba(15,23,42,.12)}
+    .mockTop{height:36px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;padding:0 12px}
+    .mockDot{width:10px;height:10px;border-radius:50%}
+    .mockBody{padding:14px;display:flex;flex-direction:column;gap:10px}
+    .mockBubble{max-width:82%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.5}
+    .mockUser{align-self:flex-end;background:#0f172a;color:#fff;border-bottom-right-radius:4px}
+    [data-theme="dark"] .mockUser{background:#1e293b}
+    .mockBot{align-self:flex-start;background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:4px}
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
+    @media(max-width:860px){.features{grid-template-columns:1fr}}
+    .featCard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;position:relative;overflow:hidden}
+    .featCard::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#0ea5e9,#6366f1);opacity:.9}
+    .featIcon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#e0f2fe,#f0f9ff);border:1px solid #bae6fd;font-size:18px}
+    [data-theme="dark"] .featIcon{background:#0c1a2e;border-color:#1e3a5f}
+    .featTitle{font-weight:800;font-size:14px;margin-top:10px}
+    .featDesc{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.6}
+    .stats{display:flex;gap:18px;justify-content:center;margin-top:18px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+    .stats b{color:var(--text)}
+  </style>
+</head>
+<body>
+  <div class="bgGlow"></div>
+  <header class="topbar">
+    <div class="topbarInner">
+      <a href="/" class="brandRow" style="text-decoration:none;color:inherit">
+        <img src="weathergpt.png" alt="WeatherGPT" style="width:28px;height:28px;border-radius:6px;object-fit:cover" />
+        <span class="brandName">WeatherGPT</span>
+        <span class="brandBadge">INDIA</span>
+      </a>
+      <div class="topActions">
+        <a href="/history.html" class="topLink">History</a>
+        <a href="/alerts.html" class="topLink">Alerts</a>
+        <a href="/study.html" class="topLink">Study</a>
+        <a href="/chat" class="topLink" style="color:#0ea5e9;font-weight:700">Open App</a>
+        <button id="themeToggleLand" class="iconBtn" aria-label="Toggle theme">◐</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="landingPage">
+    <section class="landingHero">
+      <div class="heroLeft">
+        <h1>Weather, simply.<br><span style="background:linear-gradient(90deg,#0ea5e9,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Ask in Hinglish.</span></h1>
+        <p>Your AI Weather Assistant for India — GFS + ML correction, voice in English & Hinglish, history and alerts. No clutter, just answers.</p>
+        <div class="heroActions">
+          <a href="/chat" class="launchBtn">Launch App →</a>
+          <a href="/study.html" class="ghostBtn">How it works</a>
+        </div>
+        <div class="stats"><span><b>4</b> products</span> • <span><b>English</b> & Hinglish</span> • <span><b>Voice</b> ready</span></div>
+      </div>
+      <div class="heroMock">
+        <div class="mockTop"><span class="mockDot" style="background:#ef4444"></span><span class="mockDot" style="background:#f59e0b"></span><span class="mockDot" style="background:#22c55e"></span><span style="margin-left:8px;font-size:12px;color:var(--muted)">WeatherGPT — Chat</span></div>
+        <div class="mockBody">
+          <div class="mockBubble mockUser">Kal Patna me mausam kaisa rahega?</div>
+          <div class="mockBubble mockBot"><b style="font-size:12px;color:var(--muted)">Patna · Tomorrow 32° </b><br>Kal Patna me 32°C, 49% humidity, light wind 5 km/h. Thoda garmi hogi — stay hydrated.</div>
+          <div class="mockBubble mockUser">Will it be hot tomorrow in Delhi?</div>
+          <div class="mockBubble mockBot">Delhi tomorrow ~33°C, humidity 28% — yes, hot. Carry water.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <div class="featCard"><div class="featIcon">💬</div><div class="featTitle">Ask naturally</div><div class="featDesc">“Kal Patna ka weather kaisa hai?” or “Will it be hot tomorrow in Delhi?” — understands both, replies in your language.</div></div>
+      <div class="featCard"><div class="featIcon">🎙</div><div class="featTitle">Voice ready</div><div class="featDesc">Tap the mic, speak, and get a spoken reply with Groq Whisper + Orpheus. No typing needed.</div></div>
+      <div class="featCard"><div class="featIcon">📊</div><div class="featTitle">More than chat</div><div class="featDesc">History timeline via ERA5, proactive IMD alerts, and Study Hub to actually learn weather — not just ask.</div></div>
+    </section>
+
+    <section style="margin-top:18px;text-align:center">
+      <span style="font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase">India-focused · GFS + XGBoost · Voice · History · Alerts · Study</span>
+    </section>
+  </main>
+
+  <script>
+    const tLand=document.getElementById("themeToggleLand");
+    function applyLand(t){ document.documentElement.setAttribute("data-theme",t); localStorage.setItem("theme",t); if(tLand) tLand.textContent=t==="dark"?"☀":"◐"; }
+    if(tLand) tLand.addEventListener("click",()=>{ const cur=document.documentElement.getAttribute("data-theme")||"light"; applyLand(cur==="dark"?"light":"dark"); });
+    const saved=localStorage.getItem("theme"); if(saved) applyLand(saved);
+    else if(window.matchMedia("(prefers-color-scheme: dark)").matches) applyLand("dark");
+  </script>
+</body>
+</html>
