@@ -89,7 +89,7 @@ WeatherGpt/
 │   └── weathergpt.png / favicon.ico / icon-180.png  # favicon + push icon/badge
 ├── requirements.txt
 ├── .env.example
-└── .env                        # not committed (see Quick Start)
+└──
 ```
 
 ---
