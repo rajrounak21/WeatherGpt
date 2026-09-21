@@ -1,0 +1,58 @@
+[
+  {
+    "id": "thunderstorms",
+    "title": "Thunderstorms",
+    "description": "Why warm air rises and storms form",
+    "icon": "storm",
+    "lessons": [
+      {"title": "What is a thunderstorm?", "body": "A thunderstorm is a storm that produces lightning and thunder. It needs warm, moist air.", "visual": "warm_rising", "key_idea": "Warm, moist air rises and helps create thunderstorms."},
+      {"title": "Why does warm air rise?", "body": "Warm air is less dense than cooler air, so it rises through surrounding cooler, denser air.", "visual": "density", "key_idea": "Less dense → rises."},
+      {"title": "The role of moisture", "body": "Moisture provides the water that forms clouds and rain inside the storm.", "visual": "moisture", "key_idea": "Moisture fuels clouds."}
+    ],
+    "quiz": [
+      {"id": "t1", "text": "Why does warm air rise during thunderstorm formation?", "options": ["Because warm air is less dense", "Because warm air contains no moisture", "Because clouds push it upward", "Because wind always moves upward"], "correct": 0, "why": "Warm air is less dense, so it rises through cooler, denser air. This rising warm, moist air helps thunderstorms develop.", "misconception": "Clouds don't push warm air upward — warm air rises because it is less dense."},
+      {"id": "t2", "text": "What happens when warm, less-dense air meets cooler, denser air?", "options": ["It sinks below the cooler air", "It rises above the cooler air", "It stops moving", "It turns into snow"], "correct": 1, "why": "Less-dense warm air tends to rise above cooler, denser air.", "misconception": "It doesn't sink — warm air rises."},
+      {"id": "t3", "text": "Which is most needed for a thunderstorm?", "options": ["Warm, moist air", "Cold, dry air", "Strong ground wind", "High pressure"], "correct": 0, "why": "Warm, moist air provides energy and moisture for storm clouds.", "misconception": "Dry air doesn't fuel thunderstorms."},
+      {"id": "t4", "text": "Lightning is mainly caused by?", "options": ["Clouds pushing air", "Electrical charge separation in clouds", "Rain hitting ground", "Wind cooling"], "correct": 1, "why": "Charge separation inside storm clouds creates lightning.", "misconception": "Lightning is not from clouds pushing."},
+      {"id": "t5", "text": "Key idea to remember?", "options": ["Warm air → less dense → rises", "Warm air → heavy → sinks", "Clouds control air movement", "Wind always rises"], "correct": 0, "why": "Warm air → less dense → rises is the core idea.", "misconception": "Remember: warm air rises."}
+    ]
+  },
+  {
+    "id": "humidity",
+    "title": "Humidity",
+    "description": "Why humid air feels hotter",
+    "icon": "droplet",
+    "lessons": [
+      {"title": "What is humidity?", "body": "Humidity tells how much water vapor is in the air.", "visual": "humidity", "key_idea": "Humidity = moisture in the air."},
+      {"title": "Why does humidity feel uncomfortable?", "body": "When humidity is high, sweat evaporates more slowly. So 32°C humid feels hotter than 32°C dry.", "visual": "sweat", "key_idea": "Sweat cools you less when humid."}
+    ],
+    "quiz": [
+      {"id": "h1", "text": "Why does high humidity make the same temperature feel hotter?", "options": ["Sweat evaporates slowly", "Air becomes thinner", "Wind stops", "Sun gets stronger"], "correct": 0, "why": "High humidity slows sweat evaporation, so your body cools less.", "misconception": "It's not thinner air — it's slower evaporation."},
+      {"id": "h2", "text": "Humidity measures?", "options": ["Moisture in the air", "Wind speed", "Air pressure", "Cloud height"], "correct": 0, "why": "Humidity = moisture in the air.", "misconception": "Not wind or pressure."}
+    ]
+  },
+  {
+    "id": "rain",
+    "title": "Understanding Rain",
+    "description": "From clouds to rainfall",
+    "icon": "rain",
+    "lessons": [
+      {"title": "How rain forms", "body": "Water vapor cools, condenses into droplets, and falls when heavy enough.", "visual": "rain_cycle", "key_idea": "Cool → condense → fall."}
+    ],
+    "quiz": [
+      {"id": "r1", "text": "Rain falls when?", "options": ["Droplets become heavy enough", "Wind pushes clouds down", "Sun heats clouds", "Air becomes dry"], "correct": 0, "why": "Droplets grow and fall when heavy enough.", "misconception": "Wind doesn't push rain down."}
+    ]
+  },
+  {
+    "id": "heatwave",
+    "title": "Heat Wave",
+    "description": "What happens, why it occurs, safety",
+    "icon": "sun",
+    "lessons": [
+      {"title": "What is a heat wave?", "body": "Prolonged period of unusually hot weather, often with high humidity.", "visual": "heat", "key_idea": "Heat wave = unusual, prolonged heat."}
+    ],
+    "quiz": [
+      {"id": "hw1", "text": "Heat wave means?", "options": ["Unusually hot for many days", "One hot afternoon", "Only high humidity", "Rainy period"], "correct": 0, "why": "It's prolonged unusually hot weather.", "misconception": "Not just one afternoon."}
+    ]
+  }
+]
