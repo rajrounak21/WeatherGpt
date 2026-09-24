@@ -394,7 +394,7 @@ Notification click: `ui/sw.js:1` `push` → `showNotification(🚨 Orange Alert 
 
 ## Model Details — `model/weathergpt_temperature_bias_correction_ipynb.ipynb`
 
-It contains:
+It contains: 
 
 1.  **Data:** `load_dataset("Arko007/weathergpt-d1-mos-dataset")` — 127 parquet files from Open-Meteo D1-MOS GFS archive vs ground-truth observations across Indian cities. Columns: `fc_temperature_2m_gfs_seamless`, `fc_relative_humidity_2m_gfs_seamless`, `fc_wind_speed_10m_gfs_seamless`, `lead_hours`, `lat`, `lon`, `elevation_m`, `hour_utc`, `month`, `valid_time`, `truth_temperature_2m`.
 2.  **Label:** `temperature_error = truth_temperature_2m - fc_temperature_2m_gfs_seamless` (model predicts the GFS bias, not absolute temperature).
