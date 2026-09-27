@@ -1,4 +1,3 @@
-"""WeatherGPT FastAPI — Phase 2: frontend never talks to GFS/Groq directly"""
 
 import sys
 sys.stdout.reconfigure(encoding="utf-8")
