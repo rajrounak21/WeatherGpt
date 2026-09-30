@@ -1,4 +1,3 @@
-"""MongoDB connection — Phase 0/1: uses MONGODB_URI, district_id as key"""
 import os
 from dotenv import load_dotenv
 
