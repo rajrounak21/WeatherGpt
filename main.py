@@ -24,7 +24,7 @@ from history.router import router as history_router
 from study_hub.router import router as study_router
 from fastapi.responses import FileResponse
 
-app = FastAPI(title="WeatherGPT API — Phase 2 + History + Study")
+app = FastAPI(title="WeatherGPT  — Precision Weather Intelligence Powered by Physics & Machine Learning")
 
 app.include_router(history_router)
 app.include_router(study_router)
