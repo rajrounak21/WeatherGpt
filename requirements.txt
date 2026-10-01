@@ -1,5 +1,5 @@
-numpy
 requests
+numpy
 datasets
 xgboost<3.0
 langchain
