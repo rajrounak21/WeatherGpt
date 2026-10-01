@@ -1,4 +1,4 @@
-"""Simple preview: Text + Voice WeatherGPT Agent"""
+"""Simple preview: Voice + Text WeatherGPT Agent"""
 
 import sys
 sys.stdout.reconfigure(encoding="utf-8")
