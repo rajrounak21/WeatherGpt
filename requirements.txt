@@ -3,10 +3,10 @@ numpy
 datasets
 xgboost<3.0
 python-dotenv
+groq
 langchain
 langgraph
 langchain-groq
-groq
 langchain-core
 langchain-community
 fastapi
