@@ -2,11 +2,11 @@ requests
 numpy
 datasets
 xgboost<3.0
+python-dotenv
 langchain
 langgraph
 langchain-groq
 groq
-python-dotenv
 langchain-core
 langchain-community
 fastapi
