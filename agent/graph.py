@@ -1,4 +1,4 @@
-"""Simple LangGraph agent: Groq LLM + weather_tool"""
+"""Simple LangGraph agent: Groq LLM + weather_tools"""
 
 import os
 from dotenv import load_dotenv
