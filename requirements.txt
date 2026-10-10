@@ -1,4 +1,5 @@
 requests
+ipykernel
 numpy
 datasets
 xgboost<3.0
@@ -14,4 +15,3 @@ uvicorn
 pymongo
 pywebpush
 apscheduler
-ipykernel
