@@ -4,6 +4,7 @@ numpy
 datasets
 xgboost<3.0
 python-dotenv
+pymongo
 groq
 langchain
 langgraph
