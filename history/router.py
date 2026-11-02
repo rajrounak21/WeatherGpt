@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Query, HTTPException
 from .providers.open_meteo import geocode_location
+
 from .service import get_history, get_day_detail
 
 router = APIRouter(prefix="/api/history", tags=["history"])
