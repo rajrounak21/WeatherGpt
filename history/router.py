@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Query, HTTPException
 from .providers.open_meteo import geocode_location
 
