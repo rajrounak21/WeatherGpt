@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
-
 MONGODB_URI = os.getenv("MONGODB_URI", "").strip()
 DB_NAME = os.getenv("MONGODB_DB", "weathergpt")
 
