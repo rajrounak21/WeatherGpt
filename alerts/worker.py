@@ -4,7 +4,6 @@ Background worker — NOT triggered by user, runs every ALERT_POLL_INTERVAL_MIN.
 
 import os
 from dotenv import load_dotenv
-
 load_dotenv(override=True)
 
 POLL_MIN = int(os.getenv("ALERT_POLL_INTERVAL_MIN", "15"))
