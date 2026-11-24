@@ -4,7 +4,6 @@ Worker calls this, NOT the LLM.
 """
 
 import hashlib
-
 def normalize_warning(raw_item: dict) -> dict:
     """
     Convert IMD raw (district_api or cap) into internal format:
