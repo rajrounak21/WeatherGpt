@@ -2,6 +2,7 @@
 Web Push — called by engine after new warning matched to district.
 """
 
+
 def send_web_push(subscription: dict, title: str, body: str, url: str = "/", severity: str = "orange") -> bool:
     """
     Send via pywebpush — premium warning style with siren.
